@@ -3,7 +3,8 @@ from typing import Optional, Any
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from pandahub.api.dependencies import pandahub
+from pandahub.api.dependencies import pandahub, current_active_user
+from pandahub.api.internal.models import UserDB
 
 router = APIRouter(
     prefix="/projects",
@@ -83,6 +84,29 @@ class SetProjectSettingsValueModel(BaseModel):
 @router.post("/set_project_settings_value")
 def set_project_settings_value(data: SetProjectSettingsValueModel, ph=Depends(pandahub)):
     ph.set_project_settings_value(**data.dict())
+
+class SetUserProjectSettingsModel(BaseModel):
+    project_id: str
+    user_id: str
+    settings: dict
+
+@router.post("/set_user_project_settings")
+def set_user_project_settings_value(data: SetUserProjectSettingsModel,
+                                    user: UserDB = Depends(current_active_user),
+                                    ph=Depends(pandahub)):
+    ph.set_user_project_settings(**data.dict(), user_id=user.id)
+
+class SetUserProjectSettingsValueModel(BaseModel):
+    project_id: str
+    user_id: str
+    parameter: str
+    value: Any
+
+@router.post("/set_user_project_settings_value")
+def set_user_project_settings_value(data: SetUserProjectSettingsValueModel,
+                                    user: UserDB = Depends(current_active_user),
+                                    ph=Depends(pandahub)):
+    ph.set_user_project_settings_value(**data.dict(), user_id=user.id)
 
 # -------------------------
 # Metadata
