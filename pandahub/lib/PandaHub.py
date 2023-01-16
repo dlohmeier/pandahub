@@ -161,17 +161,20 @@ class PandaHub:
     # Project handling
     # -------------------------
 
-    def create_project(self, name, settings=None, realm=None, metadata=None, project_id=None,
-                       activate=True):
+    def create_project(self, name, settings=None, user_settings=None, realm=None, metadata=None,
+                       project_id=None, activate=True):
         if self.project_exists(name, realm):
             raise PandaHubError("Project already exists")
         if settings is None:
             settings = {}
+        if user_settings is None:
+            user_settings = {}
         if metadata is None:
             metadata = {}
         project_data = {"name": name,
                         "realm": realm,
                         "settings": settings,
+                        "user_settings": user_settings,
                         "metadata": metadata,
                         "version": __version__}
         if project_id:
